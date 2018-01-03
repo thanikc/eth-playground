@@ -1,0 +1,17 @@
+{
+  "name": "eth-playground-truffle",
+  "version": "1.0.0",
+  "description": "",
+  "main": "truffle.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "truffle test"
+  },
+  "author": "Thanik Cheowtirakul",
+  "license": "ISC",
+  "dependencies": {
+    "web3": "^0.14.0"
+  }
+}

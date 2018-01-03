@@ -1,16 +1,19 @@
 <html>
   <head>
      <title>Introduction to Dapps. Simple MetaMask example.</title>
-     <script type="text/javascript" src="./bower_components/web3/dist/web3.min.js"></script>
   </head>
   <body>
   <p>
-    This example is taken from <a href="https://citywebconsultants.co.uk/blog/blockchain/introducing-ethereum-development-part-1-metamask-and-web3">this</a> tutorial.
+    This example is a modification from <a href="https://citywebconsultants.co.uk/blog/blockchain/introducing-ethereum-development-part-1-metamask-and-web3">this</a> tutorial.
+  </p>
+  <p>
+    You can request Ether at <a href="https://faucet.metamask.io/">https://faucet.metamask.io/</a>.
   </p>
   <table>
     <tr><td>Coinbase:</td><td id="coinbase"></td></tr>
     <tr><td>Balance:</td><td id="balance"></td></tr>
   </table>
+  <h2 id="meta-mask-required" style='color: red;'></h2>
   <fieldset>
     <label> Ether:
       <input type="text" id="amount"></input>
@@ -25,25 +28,33 @@
   </table>
 
   <script>
-    var receipientAccount;
-    
+    const receipientAccount = "0xc934AAa08c888bFd24CDA8Bc9FD46e74e2621E16"; // Ropsten Test Network Test Account    
 
-    function updateBalance() {
-      document.getElementById('balance').textContent = web3.eth.getBalance(web3.eth.coinbase) / 1000000000000000000;
-      document.getElementById('receipientBalance').textContent = web3.eth.getBalance(receipientAccount) / 1000000000000000000;
+    function updateBalance(coinbase, receipient) {
+      web3.eth.getBalance(coinbase, (err, result) => {
+        document.getElementById('balance').textContent = result / 1000000000000000000;
+      });
+      web3.eth.getBalance(receipient, (err, result) => {
+        document.getElementById('receipientBalance').textContent = result / 1000000000000000000;
+      });
     }
 
     window.onload = function() {
       if (typeof web3 !== 'undefined') {
-        web3 = new Web3(web3.currentProvider);
+        web3.version.getNetwork((err, netId) => {
+          switch (netId) {
+            case "3":
+              console.log('This is the ropsten test network.')
+              document.getElementById('coinbase').textContent = web3.eth.coinbase;
+              document.getElementById('receipientAccount').textContent = receipientAccount;
+              updateBalance(web3.eth.coinbase, receipientAccount);
+              break
+            default:
+              document.getElementById('meta-mask-required').textContent = 'You should switch network to Ropsten Test in order to avoid accidentally transfer real ether into a test account.'
+          }
+        })
       } else {
-        web3 = new Web3(new Web3.providers.HttpProvider("http://localhost:8545"));
-
-        receipientAccount = web3.eth.accounts[9];
-
-        document.getElementById('coinbase').textContent = web3.eth.coinbase;
-        document.getElementById('receipientAccount').textContent = receipientAccount;
-        updateBalance();
+        document.getElementById('meta-mask-required').innerHTML = 'You need <a href="https://metamask.io/">MetaMask</a> browser plugin to run this example'
       }
     }
 
@@ -54,8 +65,10 @@
         value: web3.toWei(document.getElementById("amount").value, 'ether')
       }, function(error, result) {
         if (!error) {
-          document.getElementById('transaction').innerHTML = 'Transaction: <pre>' + JSON.stringify( web3.eth.getTransaction(result), null, 2 ) + '</pre>';
-          updateBalance();
+          web3.eth.getTransaction(result, (err, res) => {
+            document.getElementById('transaction').innerHTML = 'Transaction: <pre>' + JSON.stringify(res, null, 2) + '</pre>';
+            updateBalance(web3.eth.coinbase, receipientAccount);
+          });
         } else {
           document.getElementById('response').innerHTML = '<pre>' + error + '</pre>'
         }

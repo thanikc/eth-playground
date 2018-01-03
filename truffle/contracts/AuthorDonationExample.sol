@@ -6,8 +6,8 @@ pragma solidity ^0.4.4;
 contract AuthorDonation {
 
   // Accounts for each of the two participants in the contract with the 'address' type.
-  address author = 0x34f06373e492e6ba87cbcb655ccc1d0951f734d3;
-  address editor = 0x7a8f86c5c3ca815e182188567cc44ca9738549af;
+  address author = 0xb06fdc0b49f3377589437abad432003ab1e612b1;
+  address editor = 0x134d09c34c0b628d51e692d68eb4d3899606117b;
 
   // This method will be called from the Dapp.
   // Any function which uses funds must contain the keyword payable.
