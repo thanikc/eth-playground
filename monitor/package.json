@@ -1,0 +1,15 @@
+{
+  "name": "eth-playground-monitor",
+  "version": "1.0.0",
+  "description": "Monitoring service for ethereum sandbox project",
+  "main": "watchingConfirmation.js",
+  "scripts": {
+    "start": "node watchingConfirmation.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Thanik Cheowtirakul",
+  "license": "ISC",
+  "dependencies": {
+    "web3": "^0.14.0"
+  }
+}
