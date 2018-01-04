@@ -1,6 +1,7 @@
 <html>
   <head>
      <title>Introduction to Dapps. Simple MetaMask example.</title>
+     <link rel="icon" href="./favicon.ico" type="image/x-icon"/>
   </head>
   <body>
   <p>
@@ -13,6 +14,10 @@
     <tr><td>Coinbase:</td><td id="coinbase"></td></tr>
     <tr><td>Balance:</td><td id="balance"></td></tr>
   </table>
+  <table>
+    <tr><td>Receipient:</td><td id="receipientAccount"></td></tr>
+    <tr><td>Balance:</td><td id="receipientBalance"></td></tr>
+  </table>
   <h2 id="meta-mask-required" style='color: red;'></h2>
   <fieldset>
     <label> Ether:
@@ -22,13 +27,9 @@
     <div id="response"></div>
   </fieldset>
   <div id="transaction"></div>
-  <table>
-    <tr><td>Receipient:</td><td id="receipientAccount"></td></tr>
-    <tr><td>Balance:</td><td id="receipientBalance"></td></tr>
-  </table>
 
   <script>
-    const receipientAccount = "0xc934AAa08c888bFd24CDA8Bc9FD46e74e2621E16"; // Ropsten Test Network Test Account    
+    const receipientAccount = "0xf1f6cea7fc818c91fa1bb23ac60543a14a721979"; // Ropsten Test Network Test Account    
 
     function updateBalance(coinbase, receipient) {
       web3.eth.getBalance(coinbase, (err, result) => {
@@ -54,8 +55,18 @@
           }
         })
       } else {
-        document.getElementById('meta-mask-required').innerHTML = 'You need <a href="https://metamask.io/">MetaMask</a> browser plugin to run this example'
+        document.getElementById('meta-mask-required').innerHTML = 'You need <a href="https://metamask.io/">MetaMask</a> browser plugin to run this example.'
       }
+
+      const filter = web3.eth.filter('latest');
+      filter.watch((err, res) => {
+        if (err) {
+          console.log(`Watch error: ${err}`);
+        } else {
+          console.log(res);
+          updateBalance(web3.eth.coinbase, receipientAccount);
+        }
+      });
     }
 
     function send() {
@@ -66,8 +77,7 @@
       }, function(error, result) {
         if (!error) {
           web3.eth.getTransaction(result, (err, res) => {
-            document.getElementById('transaction').innerHTML = 'Transaction: <pre>' + JSON.stringify(res, null, 2) + '</pre>';
-            updateBalance(web3.eth.coinbase, receipientAccount);
+            document.getElementById('transaction').innerHTML = 'Transaction: <pre>' + JSON.stringify(res, null, 2) + '</pre><button onclick="location.reload()">reload</button>';
           });
         } else {
           document.getElementById('response').innerHTML = '<pre>' + error + '</pre>'
