@@ -13,16 +13,16 @@
     <md-button v-on:click="getStoredData" class="md-raised md-primary">get Stored Data</md-button>
     <md-button v-on:click="setStoredData" class="md-raised md-accent">set Stored Data</md-button>
 
-    <md-card v-if="lastTransaction.address">
+    <md-card v-if="lastTransaction.address" class="transaction-history">
       <md-card-header>
         <div class="md-title">Last Transaction</div>
       </md-card-header>
       <md-card-content>
-        <pre>{{ lastTransaction.receipt }}</pre>
+        <pre>{{ JSON.stringify(lastTransaction.receipt, null, 2) }}</pre>
       </md-card-content>
-      <md-card-actions>
-        <md-button @click="updateTransactionReceipt(lastTransaction.address)">Refresh</md-button>
-      </md-card-actions>
+      <md-card-action v-if="refreshCount === refreshLimit">
+        <md-button @click="refreshCount = 0; updateTransactionReceipt(lastTransaction.address)">Refresh</md-button>
+      </md-card-action>
     </md-card>
 
   </div>
@@ -39,7 +39,9 @@ export default {
   data: () => ({
     msg: '',
     storedData: '',
-    lastTransaction: { address: null, receipt: null }
+    lastTransaction: { address: null, receipt: null },
+    refreshCount: 0,
+    refreshLimit: 60
   }),
   created () {
     this.setupWeb3()
@@ -72,15 +74,15 @@ export default {
       pragma solidity ^0.4.4;
 
       contract VueExample {
-          bytes32 storedData;
+        bytes32 storedData;
 
-          function set(bytes32 x) public {
-              storedData = x;
-          }
+        function set(bytes32 x) public {
+          storedData = x;
+        }
 
-          function get() public constant returns(bytes32) {
-              return storedData;
-          }
+        function get() public constant returns(bytes32) {
+          return storedData;
+        }
       }
       */
       return window.web3.eth.contract([
@@ -140,7 +142,17 @@ export default {
         if (err) {
           console.error(err)
         } else {
-          this.lastTransaction.receipt = JSON.stringify(res, null, 2)
+          if (res) {
+            this.refreshCount = 0
+            this.lastTransaction.receipt = res
+          } else {
+            this.lastTransaction.receipt = `Transaction ${transaction} in progress ... (${++this.refreshCount})`
+            if (this.refreshCount < this.refreshLimit) {
+              setTimeout(() => {
+                this.updateTransactionReceipt(transaction)
+              }, 1000)
+            }
+          }
         }
       })
     }
@@ -149,7 +161,10 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.transaction-history {
+  margin: 1em;
   pre {
     text-align: left;
   }
+}
 </style>
