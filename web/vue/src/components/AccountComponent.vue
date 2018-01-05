@@ -25,6 +25,15 @@ export default {
     const web3 = window.web3
     if (typeof web3 !== 'undefined') {
       this.metaMaskDetected = web3.currentProvider.isMetaMask
+      this.updateDisplay()
+
+      document.addEventListener('click', this.updateDisplay)
+    }
+  },
+  methods: {
+    updateDisplay () {
+      const web3 = window.web3
+
       this.account = web3.eth.coinbase
       web3.eth.getBalance(this.account, (err, result) => {
         if (!err) {
