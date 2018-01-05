@@ -5,12 +5,14 @@
       <tr><td>Account:</td><td>{{ account }}</td></tr>
       <tr><td>Balance:</td><td>{{ balance }} ETH</td></tr>
     </table>
-    <fieldset>
-      <input type="text" v-model="addressData" placeholder="bytes32 (0x1234...) or string" style="width: 32em;"/>
-      <button v-on:click="setStoredData">set Stored Data</button>
-      <button v-on:click="getStoredData">get Stored Data</button>
-      <pre>{{ lastTransaction }}</pre>
-    </fieldset>
+    <md-field>
+      <label>Data Input</label>
+      <md-input v-model="storedData"></md-input>
+      <span class="md-helper-text">bytes32 (0x1234...) or string</span>
+    </md-field>
+    <md-button v-on:click="getStoredData" class="md-raised md-primary">get Stored Data</md-button>
+    <md-button v-on:click="setStoredData" class="md-raised md-accent">set Stored Data</md-button>
+    <pre>{{ lastTransaction }}</pre>
   </div>
 </template>
 
@@ -24,7 +26,7 @@ export default {
     msg: 'Welcome to Your Vue.js App',
     account: '-',
     balance: 0.0,
-    addressData: '',
+    storedData: '',
     lastTransaction: ''
   }),
   methods: {
@@ -110,15 +112,15 @@ export default {
       const contract = this.getContract()
       contract.get((err, result) => {
         if (!err) {
-          alert(`String: ${window.web3.toAscii(result)}\n\nBytes: ${result}`)
+          this.storedData = window.web3.toAscii(result)
         } else {
-          alert(`Error: ${err}`)
+          console.log(`Error: ${err}`)
         }
       })
     },
     setStoredData () {
       const contract = this.getContract()
-      contract.set(this.addressData, (err, result) => {
+      contract.set(this.storedData, (err, result) => {
         if (!err) {
           this.lastTransaction = result
         } else {
