@@ -1,7 +1,10 @@
 <template>
   <div>
+    
     <h2>{{ msg }}</h2>
+    
     <account></account>
+    
     <md-field>
       <label>Data Input</label>
       <md-input v-model="storedData"></md-input>
@@ -9,7 +12,19 @@
     </md-field>
     <md-button v-on:click="getStoredData" class="md-raised md-primary">get Stored Data</md-button>
     <md-button v-on:click="setStoredData" class="md-raised md-accent">set Stored Data</md-button>
-    <pre>{{ lastTransaction }}</pre>
+
+    <md-card v-if="lastTransaction.address">
+      <md-card-header>
+        <div class="md-title">Last Transaction</div>
+      </md-card-header>
+      <md-card-content>
+        <pre>{{ lastTransaction.receipt }}</pre>
+      </md-card-content>
+      <md-card-actions>
+        <md-button @click="updateTransactionReceipt(lastTransaction.address)">Refresh</md-button>
+      </md-card-actions>
+    </md-card>
+
   </div>
 </template>
 
@@ -21,14 +36,14 @@ export default {
   components: {
     'account': AccountComponent
   },
-  created () {
-    this.setupWeb3()
-  },
   data: () => ({
     msg: '',
     storedData: '',
-    lastTransaction: ''
+    lastTransaction: { address: null, receipt: null }
   }),
+  created () {
+    this.setupWeb3()
+  },
   methods: {
     setupWeb3 () {
       const web3 = window.web3
@@ -102,23 +117,39 @@ export default {
     getStoredData () {
       const contract = this.getContract()
       contract.get((err, result) => {
-        if (!err) {
-          this.storedData = window.web3.toAscii(result)
-        } else {
+        if (err) {
           console.log(`Error: ${err}`)
+        } else {
+          this.storedData = window.web3.toAscii(result)
         }
       })
     },
     setStoredData () {
       const contract = this.getContract()
       contract.set(this.storedData, (err, result) => {
-        if (!err) {
-          this.lastTransaction = result
+        if (err) {
+          console.error(err)
         } else {
-          this.lastTransaction = err
+          this.lastTransaction.address = result
+          this.updateTransactionReceipt(result)
+        }
+      })
+    },
+    updateTransactionReceipt (transaction) {
+      window.web3.eth.getTransactionReceipt(transaction, (err, res) => {
+        if (err) {
+          console.error(err)
+        } else {
+          this.lastTransaction.receipt = JSON.stringify(res, null, 2)
         }
       })
     }
   }
 }
 </script>
+
+<style lang="scss" scoped>
+  pre {
+    text-align: left;
+  }
+</style>
