@@ -21,14 +21,14 @@
         </md-toolbar>
 
         <md-list>
-          <md-list-item>
+          <md-list-item @click="routeTo('home')" :disabled="isActiveRoute('home')">
             <md-icon>home</md-icon>
-            <span class="md-list-item-text"><router-link :to="{ name: 'home' }">Home</router-link></span>
+            <span class="md-list-item-text">Home</span>
           </md-list-item>
 
-          <md-list-item>
+          <md-list-item @click="routeTo('storage')" :disabled="isActiveRoute('storage')">
             <md-icon>move_to_inbox</md-icon>
-            <span class="md-list-item-text"><router-link :to="{ name: 'storage' }">Storage</router-link></span>
+            <span class="md-list-item-text">Storage</span>
           </md-list-item>
 
           <md-list-item>
@@ -43,7 +43,7 @@
         </md-list>
       </md-app-drawer>
 
-      <md-app-content>
+      <md-app-content class="router-view-content">
         <router-view/>
       </md-app-content>
 
@@ -59,6 +59,14 @@ export default {
     menuVisible: false
   }),
   methods: {
+    isActiveRoute (name) {
+      return this.$route.name === name
+    },
+    routeTo (name) {
+      this.$router.push({ name: name, params: {} })
+      this.toggleMenu()
+      console.log(this.$route.name)
+    },
     toggleMenu () {
       this.menuVisible = !this.menuVisible
     }
@@ -110,4 +118,7 @@ td {
   max-width: calc(100vw - 125px);
 }
 
+.router-view-content {
+  margin-top: 8px;
+}
 </style>

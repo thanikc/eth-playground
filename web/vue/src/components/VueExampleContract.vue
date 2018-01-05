@@ -1,10 +1,7 @@
 <template>
-  <div class="hello">
+  <div>
     <h2>{{ msg }}</h2>
-    <table>
-      <tr><td>Account:</td><td>{{ account }}</td></tr>
-      <tr><td>Balance:</td><td>{{ balance }} ETH</td></tr>
-    </table>
+    <account></account>
     <md-field>
       <label>Data Input</label>
       <md-input v-model="storedData"></md-input>
@@ -17,15 +14,18 @@
 </template>
 
 <script>
+import AccountComponent from '@/components/AccountComponent'
+
 export default {
   name: 'VueExampleContract',
+  components: {
+    'account': AccountComponent
+  },
   created () {
     this.setupWeb3()
   },
   data: () => ({
-    msg: 'Welcome to Your Vue.js App',
-    account: '-',
-    balance: 0.0,
+    msg: '',
     storedData: '',
     lastTransaction: ''
   }),
@@ -42,24 +42,15 @@ export default {
 
           switch (netId) {
             case '3':
-              this.msg = 'You are connected to the Ropsten Test Network.'
-              this.refreshAccount(web3)
+              this.msg = ''
               break
             default:
-              this.msg = 'You should switch network to Ropsten Test in order to avoid accidentally transfer real ether into a test account.'
+              this.msg = 'You must switch to Ropsten Test Network in order for this example to work correctly.'
           }
         })
       } else {
         this.msg = 'You need the <a href="https://metamask.io/">MetaMask</a> browser plugin to run this example.'
       }
-    },
-    refreshAccount (web3) {
-      this.account = web3.eth.coinbase
-      web3.eth.getBalance(this.account, (err, result) => {
-        if (!err) {
-          this.balance = result / 1000000000000000000
-        }
-      })
     },
     getContract () {
       /* created at 0xb9d1dfd5b7bb489cfa333e07ce57dc29c016c32d in Ropsten Test Network
