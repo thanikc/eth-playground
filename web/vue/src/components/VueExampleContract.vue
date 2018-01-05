@@ -146,7 +146,7 @@ export default {
             this.refreshCount = 0
             this.lastTransaction.receipt = res
           } else {
-            this.lastTransaction.receipt = `Transaction ${transaction} in progress ... (${++this.refreshCount})`
+            this.lastTransaction.receipt = `Transaction ${transaction} in progress ... | Timeout: ${this.refreshLimit - ++this.refreshCount}`
             if (this.refreshCount < this.refreshLimit) {
               setTimeout(() => {
                 this.updateTransactionReceipt(transaction)
