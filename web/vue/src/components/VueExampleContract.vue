@@ -16,7 +16,7 @@
 
 <script>
 export default {
-  name: 'HelloWorld',
+  name: 'VueExampleContract',
   created () {
     this.setupWeb3()
   },
@@ -110,7 +110,7 @@ export default {
       const contract = this.getContract()
       contract.get((err, result) => {
         if (!err) {
-          alert(window.web3.toAscii(result))
+          alert(`String: ${window.web3.toAscii(result)}\n\nBytes: ${result}`)
         } else {
           alert(`Error: ${err}`)
         }
